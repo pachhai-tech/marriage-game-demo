@@ -29,6 +29,25 @@ const MiddleNav: NextPage = () => {
       </Link>
 
       <Link
+        href='/games'
+        className='no-underline outline-none visited:text-current'
+      >
+        <MenuButton
+          iconSrc='/logo.svg'
+          labelText='Games'
+          buttonWidth='192px'
+          buttonBackgroundColor={
+            pathname === '/games' ? COLORS['black-3'] : 'unset'
+          }
+          buttonBorder='unset'
+          navInnerContentContainerWidth='unset'
+          menuNavTextColor={
+            pathname === '/games' ? COLORS['white-0'] : COLORS['white-1']
+          }
+        />
+      </Link>
+
+      <Link
         href='/settings'
         className='no-underline outline-none visited:text-current'
       >
