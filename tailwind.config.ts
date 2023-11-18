@@ -10,6 +10,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        'primary-cta': COLORS['primary-cta'],
+        mediumslateblue: COLORS['mediumslateblue'],
         'black-2': COLORS['black-2'],
         'white-1': COLORS['white-1'],
         'white-0': COLORS['white-0'],
@@ -21,10 +23,12 @@ const config: Config = {
         orangered: COLORS['orangered'],
         'black-0': COLORS['black-0'],
         'brand-primary': COLORS['brand-primary'],
-        'grey-2': COLORS['grey-2']
+        'grey-2': COLORS['grey-2'],
+        'intori-white': COLORS['intori-white'],
+        'intori-black': COLORS['intori-black']
       },
       backgroundColor: {
-        'primary-hover': '#bdb5ab'
+        'primary-hover': COLORS['black-0']
       },
       spacing: {
         boundvariablesdata: '24px',
@@ -47,15 +51,15 @@ const config: Config = {
     },
     fontSize: {
       xs: '12px',
-      sm: '14px',
       '3xl': '22px',
       '19xl': '38px',
+      sm: '14px',
       lg: '18px',
       '36xl': '55px',
       base: '16px',
+      '11xl': '30px',
       '9xl': '28px',
       '13xl': '32px',
-      '11xl': '30px',
       inherit: 'inherit'
     },
     screens: {
