@@ -1,11 +1,16 @@
 import Modal from '@/components/games/marriage/Modal'
 import SideNavigationMenu from '@/components/side-navigation/SideNavigationMenu'
+import { createMarriageScoreTrackerFirebase } from '@/lib/firebase/functions/createMarriageScoreTracker'
+import { GameSettings } from '@/types/marriage'
 import { useRouter } from 'next/router'
 import { FormEvent, useState } from 'react'
 
 const MarriageScoreTracker = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isNewGameModalOpen, setIsNewGameModalOpen] = useState(false)
   const [formValues, setFormValues] = useState({
+    numPlayers: 5,
+    seenPoint: 3,
+    unseenPoint: 15,
     pointRate: 0.25,
     currency: 'USD',
     dublee: true,
@@ -13,10 +18,10 @@ const MarriageScoreTracker = () => {
     dubleeBonusPoint: 5,
     foulPoint: 15,
     foulBonus: 'Next Game'
-  })
+  } as GameSettings)
   const router = useRouter()
 
-  const handleInputChange = (
+  const handleNewGameInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value, type, checked } = e.target as HTMLInputElement
@@ -26,41 +31,70 @@ const MarriageScoreTracker = () => {
     }))
   }
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleNewGameSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     // Logic to create new game, generate ID, and navigate
-    console.log(formValues)
-    setIsModalOpen(false)
-    // Placeholder for navigation, replace with actual game ID
-    router.push('/games/marriage/scoretracker/12345')
+    console.log(`New game settings: ${JSON.stringify(formValues, null, 4)}`)
+    const gameId = await createMarriageScoreTrackerFirebase(formValues)
+    setIsNewGameModalOpen(false)
+    router.push(`/games/marriage/scoretracker/${gameId}`)
+  }
+
+  const navigateToOption = (option: string) => {
+    // Update the navigation based on the selected option
+    switch (option) {
+      case 'previous-games':
+        router.push('/games/marriage/scoretracker/previousGames')
+        break
+      default:
+        console.log('Unknown option')
+    }
   }
 
   return (
-    <div className='relative bg-black w-full h-screen overflow-y-auto flex'>
+    <div className='relative bg-black-0 w-full h-screen overflow-y-auto flex flex-row items-start justify-start'>
       <SideNavigationMenu />
-      <div className='flex-1 overflow-y-auto p-6'>
-        <div className='max-w-[1100px] mx-auto'>
+      <div className='self-stretch flex-1 overflow-y-auto flex flex-col items-center justify-start p-6 text-left text-base text-white-1 font-kumbh-sans'>
+        <div className='w-full flex flex-col items-start justify-start pt-0 px-0 pb-[50px] box-border gap-[24px] max-w-[1100px] text-left text-base text-white-1 font-kumbh-sans'>
           <h1 className='text-4xl font-semibold text-white mb-8'>
             Marriage Score Tracker
           </h1>
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
             <div
-              className='bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg shadow-lg cursor-pointer'
-              onClick={() => setIsModalOpen(true)}
+              className='game-card bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg shadow-lg cursor-pointer'
+              onClick={() => setIsNewGameModalOpen(true)}
             >
               <h2 className='text-xl font-bold'>New Game</h2>
             </div>
-            {/* Add other options like Continue Game, Game History, Instructions, and About the Game */}
           </div>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+            <div
+              className='game-card bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg shadow-lg cursor-pointer'
+              onClick={() => navigateToOption('previous-games')}
+            >
+              <h2 className='text-xl font-bold'>Previous Games</h2>
+            </div>
+          </div>
+          {/* Add other options like Instructions, and About the Game */}
         </div>
       </div>
 
       <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isNewGameModalOpen}
+        onClose={() => setIsNewGameModalOpen(false)}
         title='New Game Settings'
       >
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleNewGameSubmit}>
+          <div className='mb-4'>
+            <label className='block mb-2'>Number of players:</label>
+            <input
+              type='number'
+              name='numPlayers'
+              value={formValues.numPlayers}
+              onChange={handleNewGameInputChange}
+              className='border p-2 rounded w-full'
+            />
+          </div>
           <div className='mb-4'>
             <label className='block mb-2'>Seen Point: 3</label>
           </div>
@@ -73,7 +107,7 @@ const MarriageScoreTracker = () => {
               type='number'
               name='pointRate'
               value={formValues.pointRate}
-              onChange={handleInputChange}
+              onChange={handleNewGameInputChange}
               className='border p-2 rounded w-full'
             />
           </div>
@@ -82,13 +116,11 @@ const MarriageScoreTracker = () => {
             <select
               name='currency'
               value={formValues.currency}
-              onChange={handleInputChange}
+              onChange={handleNewGameInputChange}
               className='border p-2 rounded w-full'
             >
               <option value='USD'>USD</option>
               <option value='NPR'>NPR</option>
-              <option value='GBP'>GBP</option>
-              <option value='BTN'>BTN</option>
             </select>
           </div>
           <div className='mb-4'>
@@ -97,7 +129,7 @@ const MarriageScoreTracker = () => {
               type='checkbox'
               name='dublee'
               checked={formValues.dublee}
-              onChange={handleInputChange}
+              onChange={handleNewGameInputChange}
               className='border p-2 rounded'
             />
           </div>
@@ -107,7 +139,7 @@ const MarriageScoreTracker = () => {
               type='checkbox'
               name='dubleePointLess'
               checked={formValues.dubleePointLess}
-              onChange={handleInputChange}
+              onChange={handleNewGameInputChange}
               className='border p-2 rounded'
             />
           </div>
@@ -120,7 +152,7 @@ const MarriageScoreTracker = () => {
               type='number'
               name='foulPoint'
               value={formValues.foulPoint}
-              onChange={handleInputChange}
+              onChange={handleNewGameInputChange}
               className='border p-2 rounded w-full'
             />
           </div>
@@ -129,7 +161,7 @@ const MarriageScoreTracker = () => {
             <select
               name='currency'
               value={formValues.foulBonus}
-              onChange={handleInputChange}
+              onChange={handleNewGameInputChange}
               className='border p-2 rounded w-full'
             >
               <option value='Next Game'>Next Game</option>

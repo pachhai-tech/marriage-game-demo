@@ -16,7 +16,7 @@ const Modal: React.FC<Props> = ({ isOpen, onClose, title, children }) => {
 
   return (
     <div
-      className='fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex justify-center items-center'
+      className='fixed inset-0 z-50 overflow-y-auto bg-black text-black bg-opacity-50 flex justify-center items-center'
       onClick={onClose}
     >
       <div
